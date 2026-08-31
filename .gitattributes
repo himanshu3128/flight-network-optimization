@@ -1,0 +1,13 @@
+# Normalize to LF in the repository; Git checks out native line endings.
+* text=auto
+
+*.cpp   text
+*.hpp   text
+*.py    text
+*.html  text
+*.csv   text
+*.md    text
+Makefile text
+
+*.png   binary
+*.exe   binary
