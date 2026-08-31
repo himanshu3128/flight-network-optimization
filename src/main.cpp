@@ -18,6 +18,7 @@
 #include "flightnet/routing.hpp"
 
 #include <algorithm>
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>
@@ -26,6 +27,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+#if defined(_WIN32)
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif
 
 using namespace flightnet;
 
@@ -524,6 +532,41 @@ int cmdBench(const Args& args) {
     return r.ok() ? 0 : 1;
 }
 
+// Creates one directory, tolerating "already exists". Returns false only for a
+// genuine failure. std::filesystem would be the obvious tool, but the project
+// targets C++14 on toolchains that predate it.
+bool makeDirectory(const std::string& path) {
+#if defined(_WIN32)
+    if (_mkdir(path.c_str()) == 0) return true;
+#else
+    if (::mkdir(path.c_str(), 0755) == 0) return true;
+#endif
+    return errno == EEXIST;
+}
+
+// Creates every missing component of `path`, so --out can name a directory that
+// does not exist yet. The default output lives under data/synthetic, which is
+// gitignored precisely because it is regenerable -- so on a fresh clone that
+// directory is absent and generate would otherwise fail on its documented
+// invocation.
+bool makeDirectories(const std::string& path) {
+    std::string sofar;
+    for (std::size_t i = 0; i <= path.size(); ++i) {
+        const bool atEnd = (i == path.size());
+        if (!atEnd && path[i] != '/' && path[i] != '\\') {
+            sofar += path[i];
+            continue;
+        }
+        // Skip empty components and bare drive letters like "C:".
+        if (!sofar.empty() && sofar != "." && sofar != ".." &&
+            !(sofar.size() == 2 && sofar[1] == ':')) {
+            if (!makeDirectory(sofar)) return false;
+        }
+        if (!atEnd) sofar += path[i];
+    }
+    return true;
+}
+
 int cmdGenerate(const Args& args) {
     GeneratorConfig gc;
     gc.airports  = args.num("airports", 60);
@@ -534,6 +577,8 @@ int cmdGenerate(const Args& args) {
 
     const FlightNetwork g = generate(gc);
     const std::string dir = args.str("out", "data/synthetic");
+    if (!makeDirectories(dir))
+        throw DataError("cannot create output directory: " + dir);
     saveToCsv(g, dir + "/airports.csv", dir + "/routes.csv");
 
     std::cout << "generated " << g.numAirports() << " airports and " << g.numFlights()
