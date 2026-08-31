@@ -1,0 +1,35 @@
+# Airports in the bundled example network.
+# capacity = aircraft movements the airport can handle in the planning window.
+# Figures are plausible rather than official; they exist to make the capacity
+# model interesting, not to be an authoritative source.
+code,city,country,lat,lon,capacity
+ATL,Atlanta,US,33.6407,-84.4277,2400
+JFK,New York,US,40.6413,-73.7781,1400
+ORD,Chicago,US,41.9742,-87.9073,1900
+LAX,Los Angeles,US,33.9416,-118.4085,1700
+DFW,Dallas,US,32.8998,-97.0403,1800
+SFO,San Francisco,US,37.6213,-122.3790,1100
+YYZ,Toronto,CA,43.6777,-79.6248,1000
+GRU,Sao Paulo,BR,-23.4356,-46.4731,900
+BOG,Bogota,CO,4.7016,-74.1469,700
+LHR,London,GB,51.4700,-0.4543,1500
+CDG,Paris,FR,49.0097,2.5479,1300
+AMS,Amsterdam,NL,52.3105,4.7683,1250
+FRA,Frankfurt,DE,50.0379,8.5622,1400
+MAD,Madrid,ES,40.4839,-3.5680,1050
+IST,Istanbul,TR,41.2753,28.7519,1600
+SVO,Moscow,RU,55.9726,37.4146,800
+DXB,Dubai,AE,25.2532,55.3657,1800
+DOH,Doha,QA,25.2731,51.6080,1200
+JNB,Johannesburg,ZA,-26.1367,28.2411,650
+CAI,Cairo,EG,30.1219,31.4056,600
+DEL,Delhi,IN,28.5562,77.1000,1100
+BOM,Mumbai,IN,19.0896,72.8656,900
+BKK,Bangkok,TH,13.6900,100.7501,1150
+SIN,Singapore,SG,1.3644,103.9915,1300
+HKG,Hong Kong,HK,22.3080,113.9185,1250
+PVG,Shanghai,CN,31.1443,121.8083,1500
+NRT,Tokyo,JP,35.7720,140.3929,1000
+ICN,Seoul,KR,37.4602,126.4407,1150
+SYD,Sydney,AU,-33.9399,151.1753,800
+AKL,Auckland,NZ,-37.0082,174.7850,450
