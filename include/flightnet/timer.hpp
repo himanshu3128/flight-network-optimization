@@ -53,16 +53,29 @@ private:
         return f;
     }
 
+    // Typical QPC rate on modern Windows is 10 MHz (0.1 µs ticks), matching
+    // the resolution documented at the top of this file. Using 1 as a fallback
+    // would treat raw tick counts as seconds and inflate elapsedMs() by ~1e7.
+    static const Tick kFallbackFrequency = 10000000;
+
     static Tick queryFrequency() {
         LARGE_INTEGER f;
-        if (!QueryPerformanceFrequency(&f) || f.QuadPart == 0) return 1;
-        return static_cast<Tick>(f.QuadPart);
+        if (QueryPerformanceFrequency(&f) && f.QuadPart > 0)
+            return static_cast<Tick>(f.QuadPart);
+        return kFallbackFrequency;
     }
 
     static Tick now() {
+        static Tick last = 0;
         LARGE_INTEGER c;
-        QueryPerformanceCounter(&c);
-        return static_cast<Tick>(c.QuadPart);
+        if (QueryPerformanceCounter(&c)) {
+            last = static_cast<Tick>(c.QuadPart);
+            return last;
+        }
+        // QPC failed (uninitialized LARGE_INTEGER). Reuse the last successful
+        // reading so elapsedMs() stays monotonic instead of jumping to garbage.
+        // If no reading has succeeded yet, 0 yields a zero elapsed interval.
+        return last;
     }
 #else
     typedef std::chrono::steady_clock::time_point Tick;
